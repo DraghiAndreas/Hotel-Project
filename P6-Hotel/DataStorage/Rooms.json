@@ -1,0 +1,26 @@
+[
+  {
+    "Id": 101,
+    "Type": 0,
+    "Price": 100,
+    "Status": 1
+  },
+  {
+    "Id": 102,
+    "Type": 0,
+    "Price": 100,
+    "Status": 0
+  },
+  {
+    "Id": 103,
+    "Type": 1,
+    "Price": 104,
+    "Status": 1
+  },
+  {
+    "Id": 105,
+    "Type": 2,
+    "Price": 199,
+    "Status": 0
+  }
+]

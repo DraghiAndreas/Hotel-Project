@@ -1,0 +1,11 @@
+[
+  {
+    "Id": 5166,
+    "ClientUsername": "client",
+    "RoomId": 102,
+    "StartDate": "2026-01-09T12:03:11.9771809+02:00",
+    "EndDate": "2026-01-16T12:03:11.9796736+02:00",
+    "IsCheckedIn": false,
+    "IsCompleted": false
+  }
+]

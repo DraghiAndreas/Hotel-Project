@@ -1,0 +1,14 @@
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\bin\Debug\net9.0\P6-Hotel.exe
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\bin\Debug\net9.0\P6-Hotel.deps.json
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\bin\Debug\net9.0\P6-Hotel.runtimeconfig.json
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\bin\Debug\net9.0\P6-Hotel.dll
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\bin\Debug\net9.0\P6-Hotel.pdb
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.AssemblyInfoInputs.cache
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.AssemblyInfo.cs
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.csproj.CoreCompileInputs.cache
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.dll
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\refint\P6-Hotel.dll
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.pdb
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\P6-Hotel.genruntimeconfig.cache
+C:\Users\andy\Desktop\TOOP\P6-Hotel\P6-Hotel\obj\Debug\net9.0\ref\P6-Hotel.dll
