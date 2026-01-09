@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.Extensions.Logging;
 
 namespace P6_Hotel;
