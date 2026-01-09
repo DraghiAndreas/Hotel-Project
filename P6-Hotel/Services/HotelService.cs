@@ -10,7 +10,7 @@ public class HotelService
     private List<Room> _rooms = new List<Room>();
     private List<Reservation> _reservations = new List<Reservation>();
     private List<User> _users = new List<User>();
-
+    private HotelConfig _config;
     public HotelService(ILogger<HotelService> logger)
     {
         _logger = logger;
@@ -21,11 +21,16 @@ public class HotelService
         FileHandler.EnsureFileExists("Rooms.json");
         FileHandler.EnsureFileExists("Users.json");
         FileHandler.EnsureFileExists("Reservations.json");
-        
+        FileHandler.EnsureFileExists("Config.json");
+
         _rooms = FileHandler.LoadFile<Room>("Rooms.json");
         _users = FileHandler.LoadFile<User>("Users.json");
         _reservations = FileHandler.LoadFile<Reservation>("Reservations.json");
-
+        
+        var configs = FileHandler.LoadFile<HotelConfig>("Config.json");
+        _config = configs.FirstOrDefault() ?? new HotelConfig();
+        if(!configs.Any()) FileHandler.SaveFile("Config.json", new List<HotelConfig>{_config});
+        
         //CREEAREA ACCOUNT-URILOR DE BAZA (ADMIN, CLIENT)
         
         if (_users.Count == 0)
@@ -83,7 +88,7 @@ public class HotelService
                     {
                         if (currentUser.Role is UserRole.Admin)
                         {
-                            Console.WriteLine("\n[ADMIN MENU]\n1. Room-Manager\n2. View Reservations\n0. Logout");
+                            Console.WriteLine("\n[ADMIN MENU]\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout");
                             int input = int.Parse(Console.ReadLine());
                             switch (input)
                             {
@@ -157,6 +162,45 @@ public class HotelService
                                 case 2:
                                     ViewAllReservations();
                                     break;
+                                case 3:
+                                    Console.WriteLine("[GENERAL RULES]");
+                                    Console.WriteLine("1. Set MIN booking days\n2. Set MAX booking days");
+                                    Console.Write("Option");
+                                    int input3 = int.Parse(Console.ReadLine());
+
+                                    switch (input3)
+                                    {
+                                        case 1:
+                                            Console.WriteLine($"Minimum amount of days (current is {_config.MinBookingDays}) : ");
+                                            int temp =  int.Parse(Console.ReadLine());
+                                            if (temp > 0 && temp < _config.MaxBookingDays)
+                                            {
+                                                _config.MinBookingDays = temp;
+                                                _logger.LogWarning($"MIN booking changed to {_config.MinBookingDays}.");
+                                                FileHandler.SaveFile("Config.json", new List<HotelConfig>{_config});
+                                            }
+                                            else
+                                            {
+                                                _logger.LogWarning("Invalid MIN amount.");
+                                            }
+                                            break;
+                                        case 2:
+                                            Console.WriteLine($"Maximum amount of days (current is {_config.MaxBookingDays}) : ");
+                                            int temp1 =  int.Parse(Console.ReadLine());
+                                            if (temp1 > 0 && temp1 > _config.MinBookingDays)
+                                            { 
+                                                _config.MaxBookingDays = temp1;
+                                                _logger.LogWarning($"MAX booking changed to {_config.MaxBookingDays}.");
+                                                FileHandler.SaveFile("Config.json", new List<HotelConfig>{_config});
+                                            }
+                                            else
+                                            {
+                                                _logger.LogWarning("Invalid MAX amount.");
+                                            }
+                                            break;
+                                    }
+                                    break;
+                                
                                 case 0:
                                     currentUser = null;
                                     break;
@@ -358,7 +402,7 @@ public class HotelService
                 int counter = 1;
                 foreach (var res in reservations)
                 {
-                    Console.Write($"#{counter++} Start-date : {res.StartDate} => End-date : {res.EndDate}");
+                    Console.WriteLine($"#{counter++} Start-date : {res.StartDate} => End-date : {res.EndDate}");
                 }
             }
         }
@@ -444,6 +488,11 @@ public class HotelService
             throw new  Exception("Error: Room not found!");
         }
 
+        if (nights < _config.MinBookingDays || nights > _config.MaxBookingDays)
+        {
+            throw new Exception($"Error: Nights must be between {_config.MinBookingDays} and {_config.MaxBookingDays} days!.");
+        }
+        
         DateTime endDate = startDate.AddDays(nights);
         bool isBooked = _reservations.Any(x => 
                         x.RoomId == roomId && 
