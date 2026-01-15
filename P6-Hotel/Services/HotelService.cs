@@ -130,7 +130,7 @@ public class HotelService
                                             Console.WriteLine("Room Price: ");
                                             double price1 = double.Parse(Console.ReadLine());
                                             Console.WriteLine(
-                                                "Room Status (0 = Free, 1 = Occupied, 2 = Cleaning, 3 = Unavailable}");
+                                                "Room Status (0 = Available, 1 = Unavailable)");
                                             RoomStatus roomStatus1 = (RoomStatus)int.Parse(Console.ReadLine());
                                             try
                                             {
