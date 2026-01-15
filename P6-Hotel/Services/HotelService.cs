@@ -36,8 +36,8 @@ public class HotelService
         if (_users.Count == 0)
         {
             _logger.LogWarning("No users found! Creating default accounts.");
-            _users.Add(new User(Username: "admin", Password: "admin",UserRole.Admin));
-            _users.Add(new User(Username: "client", Password: "client", UserRole.Client));
+            _users.Add(new User(Username: "admin", Password: "admin",UserRole.Admin, Token: "hotel_tok_admin"));
+            _users.Add(new User(Username: "client", Password: "client", UserRole.Client, Token: "hotel_tok_client"));
             FileHandler.SaveFile("Users.json", _users);
         }
     }
@@ -45,7 +45,24 @@ public class HotelService
 
     public User Login(string username, string password)
     {
-        return _users.FirstOrDefault(x => x.Username == username && x.Password == password);
+        User us = _users.FirstOrDefault(x => x.Username == username && x.Password == password);
+        if (us == null)
+        {
+            throw new Exception("Username or password is incorrect!");
+        }
+
+        return us;
+    }
+
+    public User ForgotPassword(string token)
+    {
+        User us = _users.FirstOrDefault(x => x.Token == token);
+        if (us == null)
+        {
+            throw new Exception("Incorrect token!");
+        }
+
+        return us;
     }
 
     public void CreateAccount(string username, string password)
@@ -54,20 +71,24 @@ public class HotelService
         {
             throw new Exception("Username already exists");
         }
-        
-        _users.Add(new User(username, password, UserRole.Client));
+
+
+        string tok = UniqueTokenGenerator();
+        _users.Add(new User(username, password, UserRole.Client, tok));
         FileHandler.SaveFile("Users.json", _users);
         _logger.LogInformation($"New account created: {username}.");
+        _logger.LogInformation($"New account token: {tok}");
     }
     
     // ADMIN CMDS
     
     public void ViewAllRooms()
     {
+        if (_rooms.Any())
+        {
         foreach (var r in _rooms)
         {
-            Console.WriteLine($"Room ID: {r.Id} |  Room Type: {r.Type} | Room Status: {r.Status}");
-            
+            Console.WriteLine($"Room ID: {r.Id} |  Room Type: {r.Type} | Room Status: {r.Status} | Price per Night : {r.Price}$");
             if (_reservations.Any(x => x.RoomId == r.Id))
             {
                 List<Reservation> reservations = _reservations.Where(x => x.RoomId == r.Id).ToList();
@@ -77,6 +98,11 @@ public class HotelService
                     Console.WriteLine($"#{counter++} Start-date : {res.StartDate} => End-date : {res.EndDate}");
                 }
             }
+        }
+        }
+        else
+        {
+            Console.WriteLine("\nNO EXISTING ROOMS!");
         }
     }
     
@@ -128,17 +154,28 @@ public class HotelService
     
     public void ViewAllReservations()
     {
-        Console.WriteLine("Viewing all reservations :");
-        foreach (var r in _reservations)
+
+        if (_reservations.Any())
         {
-            Console.WriteLine($"Username : {r.ClientUsername} | Id : {r.Id}");
+            Console.WriteLine("Viewing all reservations :");
+            foreach (var r in _reservations)
+            {
+                Console.WriteLine($"Username : {r.ClientUsername} | Id : {r.Id}");
+            }
         }
+        else
+        {
+            Console.WriteLine("\nNO EXISTING RESERVATIONS!");
+        }
+
     }
     
     // CLIENT CMDS
 
     public void SearchAvailableRooms(RoomType roomType, DateTime startDate,  DateTime endDate)
     {
+        bool flag = false;
+        
         List<Room> availableRooms = _rooms.Where(x => x.Type == roomType && x.Status == RoomStatus.Available).ToList();
         foreach (Room room in availableRooms)
         {
@@ -147,10 +184,20 @@ public class HotelService
                                                         && !x.IsCompleted);
             if (!list.Any())
             {
+                if (flag == false)
+                {
+                    flag = true;
+                    Console.WriteLine("\n-------------\nAvailable Rooms: ");                    
+                }
                 Console.WriteLine($"{room.Id} - {room.Type}");
             }
         }
+        if (flag == false)
+        {
+            Console.WriteLine("\nUnfortunately, there are no rooms with your prefrences!");
+        }
     }
+    
     
     public void MakeReservation(string username, int roomId, DateTime startDate, int nights)
     {
@@ -335,6 +382,22 @@ public class HotelService
         FileHandler.SaveFile("Config.json", new List<HotelConfig> { _config });
         _logger.LogInformation($"Set max days to {days}.");
     }
+
+    public static string UniqueTokenGenerator()
+    {
+        const string chars = "qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*.";
+        Random rnd = new Random();
+
+        string token = "hotel_tok_";
+        for (int i = 0; i < 11; i++)
+        {
+            token += chars[rnd.Next(chars.Length)];
+        }
+
+        return token;
+    }
 }
+
+
 
 #endregion

@@ -24,16 +24,32 @@ public class MenuHandler
             if (currentUser == null)
             {
                 Console.WriteLine("\n--------- PICK AN OPTION ---------");
-                Console.WriteLine("1. Log-in (to an existing account)\n2.Create Acconut");
+                Console.WriteLine("1. Log-in (to an existing account)\n2. Create Acconut\n0. Forgot username/password");
+                Console.WriteLine("------------------------------------");
                 Console.Write("Option: ");
-                logInOpt = int.Parse(Console.ReadLine());
+                logInOpt = ReadInt();
             }
             else
             {
                 logInOpt = 1;
             }
             switch (logInOpt)
-            {
+            { 
+                case 0:
+                    Console.WriteLine("---- FORGOT INFO ----");
+                    Console.WriteLine("Please introduce your uniquly generated token");
+                    Console.Write("Token: ");
+                    string token = Console.ReadLine();
+                    try
+                    {
+                        currentUser = _hotelService.ForgotPassword(token);
+                    }
+                    catch(Exception e)
+                    {
+                        _logger.LogWarning(e.Message);
+                    }
+                    
+                    break;
                 case 1:
                     if (currentUser == null)
                     {
@@ -43,30 +59,28 @@ public class MenuHandler
                         Console.Write("Password: ");
                         string password = Console.ReadLine();
 
-                        currentUser = _hotelService.Login(username, password);
-                        if (currentUser == null)
+                        try
                         {
-                            Console.WriteLine("Invalid username or password!");
-                            _logger.LogWarning($"Failed login attempt for user: {username}.");
+                            currentUser = _hotelService.Login(username, password);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            Console.WriteLine("You successfully logged in!");
-                            _logger.LogWarning($"User {username} logged in.");
+                            _logger.LogWarning(e.Message);
                         }
                     }
                     else
                     {
                         if (currentUser.Role is UserRole.Admin)
                         {
-                            Console.WriteLine("\n[ADMIN MENU]\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout");
-                            int input = int.Parse(Console.ReadLine());
+                            Console.WriteLine("\n---- [ADMIN MENU] ----\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout\n----------------------");
+                            Console.Write("Option: ");
+                            int input = ReadInt();
                             switch (input)
                             {
                                 case 1:
                                     Console.WriteLine(
-                                        "\n[ROOM-MANAGER MENU]\n1.View ALL Rooms\n2. Add Room\n3. Modify Room\n4. Remove Room");
-                                    int input2 = int.Parse(Console.ReadLine());
+                                        "\n---- [ROOM-MANAGER MENU] ----\n1. View ALL Rooms\n2. Add Room\n3. Modify Room\n4. Remove Room\n------------------------------");
+                                    int input2 = ReadInt();
                                     switch (input2)
                                     {
                                         case 1:
@@ -75,11 +89,12 @@ public class MenuHandler
                                             break;
 
                                         case 2:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                            RoomType roomType = (RoomType)int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Price: ");
+                                            Console.WriteLine("---- CREATE NEW ROOM ----");
+                                            Console.WriteLine("New Room ID: ");
+                                            id = ReadInt();
+                                            Console.WriteLine("New Room Type (0 = Single, 1 = Double, 2 = Suite): ");
+                                            RoomType roomType = (RoomType)ReadInt();
+                                            Console.WriteLine("New Room Price / NIGHT : ");
                                             double price = double.Parse(Console.ReadLine());
                                             
                                             try
@@ -94,15 +109,15 @@ public class MenuHandler
                                             break;
 
                                         case 3:
+                                            Console.WriteLine("---- MODIFY ROOM ----");
                                             Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                            RoomType roomType1 = (RoomType)int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Price: ");
+                                            id = ReadInt();
+                                            Console.WriteLine("New Room Type (0 = Single, 1 = Double, 2 = Suite): ");
+                                            RoomType roomType1 = (RoomType)ReadInt();
+                                            Console.WriteLine("New Room Price: ");
                                             double price1 = double.Parse(Console.ReadLine());
-                                            Console.WriteLine(
-                                                "Room Status (0 = Available, 1 = Unavailable)");
-                                            RoomStatus roomStatus1 = (RoomStatus)int.Parse(Console.ReadLine());
+                                            Console.WriteLine("New Room Status (0 = Available, 1 = Unavailable)");
+                                            RoomStatus roomStatus1 = (RoomStatus)ReadInt();
                                             try
                                             {
                                                 _hotelService.ModifyRoom(id, roomType1, price1, roomStatus1);
@@ -116,7 +131,7 @@ public class MenuHandler
 
                                         case 4:
                                             Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
+                                            id = ReadInt();
                                             try
                                             {
                                                 _hotelService.RemoveRoom(id);
@@ -127,6 +142,10 @@ public class MenuHandler
                                                 _logger.LogWarning("Failed to remove room.");                                             
                                             }
                                             break;
+                                        
+                                        default:
+                                            Console.WriteLine("Invalid option.");
+                                            break;
                                     }
 
                                     break;
@@ -134,23 +153,39 @@ public class MenuHandler
                                     _hotelService.ViewAllReservations();
                                     break;
                                 case 3:
-                                    Console.WriteLine("[GENERAL RULES]");
+                                    Console.WriteLine("---- [GENERAL RULES] ----");
                                     Console.WriteLine("1. Set MIN booking days\n2. Set MAX booking days");
-                                    Console.Write("Option");
-                                    int input3 = int.Parse(Console.ReadLine());
+                                    Console.Write("Option: ");
+                                    int input3 = ReadInt();
 
                                     switch (input3)
                                     {
                                         case 1:
                                             Console.WriteLine($"Minimum amount of days (current is {_hotelService.GetMinBookingDays()}) : ");
-                                            int temp =  int.Parse(Console.ReadLine());
-                                            if (temp > 0 && temp < _hotelService.GetMaxBookingDays())
-                                            _hotelService.SetMinBookingDays(temp);
+                                            int temp =  ReadInt();
+                                            try
+                                            {
+                                                _hotelService.SetMinBookingDays(temp);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                _logger.LogWarning(e.Message);
+                                            }
                                             break;
                                         case 2:
                                             Console.WriteLine($"Maximum amount of days (current is {_hotelService.GetMaxBookingDays()}) : ");
-                                            int temp1 =  int.Parse(Console.ReadLine());
-                                            _hotelService.SetMaxBookingDays(temp1);
+                                            int temp1 =  ReadInt();
+                                            try
+                                            {
+                                                _hotelService.SetMaxBookingDays(temp1);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                _logger.LogWarning(e.Message);
+                                            }
+                                            break;
+                                        default:
+                                            Console.WriteLine("Invalid option.");
                                             break;
                                     }
                                     break;
@@ -158,27 +193,31 @@ public class MenuHandler
                                 case 0:
                                     currentUser = null;
                                     break;
+                                
+                                default:
+                                    Console.WriteLine("Invalid option.");
+                                    break;
                             }
                         }
                         else if (currentUser.Role is UserRole.Client)
                         {
                             Console.WriteLine("\n---- CLIENT MENU ----");
                             Console.WriteLine(
-                                "1. Search Rooms\n2. Reservation Hub\n3. Check-in/out\n0. Logout");
-                            int input = int.Parse(Console.ReadLine());
+                                "1. Search Rooms\n2. Reservation Hub\n3. Check-in/out\n4. Account Details\n0. Logout");
+                            int input = ReadInt();
                             switch (input)
                             {
                                 case 1:
                                     Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                    RoomType roomType = (RoomType)int.Parse(Console.ReadLine());
+                                    RoomType roomType = (RoomType)ReadInt();
                                     
                                     Console.WriteLine("Start Date :");
                                     Console.Write("Day: ");
-                                    int day1 = int.Parse(Console.ReadLine());
+                                    int day1 = ReadInt();
                                     Console.Write("Month: ");
-                                    int month1 = int.Parse(Console.ReadLine());
+                                    int month1 = ReadInt();
                                     Console.Write("Year: ");
-                                    int  year1 = int.Parse(Console.ReadLine());
+                                    int  year1 = ReadInt();
 
                                     DateTime startDate1;
                                     try
@@ -192,7 +231,7 @@ public class MenuHandler
                                     }               
                                     
                                     Console.Write("Number of Nights: ");
-                                    int nrNights = int.Parse(Console.ReadLine());
+                                    int nrNights = ReadInt();
                                     _hotelService.SearchAvailableRooms(roomType, startDate1, startDate1.AddDays(nrNights));
                                     break;
                                 case 2:
@@ -201,21 +240,21 @@ public class MenuHandler
                                     Console.WriteLine("1. Create Reservation\n2. View Reservations\n3. Delete Reservation");
                                     Console.Write("Option: ");
                                     
-                                    int input2 = int.Parse(Console.ReadLine());
+                                    int input2 = ReadInt();
 
                                     switch (input2)
                                     {
                                         case 1:
                                             Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
+                                            id = ReadInt();
                                             
                                             Console.WriteLine("Start Date :");
                                             Console.Write("Day: ");
-                                            int day = int.Parse(Console.ReadLine());
+                                            int day = ReadInt();
                                             Console.Write("Month: ");
-                                            int month = int.Parse(Console.ReadLine());
+                                            int month = ReadInt();
                                             Console.Write("Year: ");
-                                            int  year = int.Parse(Console.ReadLine());
+                                            int  year = ReadInt();
 
                                             DateTime startDate;
                                             try
@@ -229,7 +268,7 @@ public class MenuHandler
                                             }
                                             
                                             Console.WriteLine("Number of Nights: ");
-                                            int nights = int.Parse(Console.ReadLine());
+                                            int nights = ReadInt();
                                             try
                                             {
                                                 _hotelService.MakeReservation(currentUser.Username, id,startDate, nights);
@@ -247,7 +286,7 @@ public class MenuHandler
                                         
                                         case 3:
                                             Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
+                                            id = ReadInt();
                                             try
                                             {
                                                 _hotelService.RemoveReservation(currentUser.Username, id);
@@ -266,12 +305,12 @@ public class MenuHandler
                                     Console.WriteLine("---- CHECK-IN/OUT ---- ");
                                     Console.WriteLine("1. Check-in\n2. Check-out");
                                     Console.Write("Option: ");
-                                    input2 = int.Parse(Console.ReadLine());
+                                    input2 = ReadInt();
                                     switch (input2)
                                     {
                                         case 1:
                                             Console.WriteLine("Reservation ID: ");
-                                            id = int.Parse(Console.ReadLine());
+                                            id = ReadInt();
                                             try
                                             {
                                                 _hotelService.SelfCheckIn(id,currentUser.Username);
@@ -285,7 +324,7 @@ public class MenuHandler
                                         
                                         case 2:
                                             Console.WriteLine("Reservation ID: ");
-                                            id = int.Parse(Console.ReadLine());
+                                            id = ReadInt();
                                             try
                                             {
                                                 _hotelService.SelfCheckOut(id,currentUser.Username);
@@ -299,14 +338,27 @@ public class MenuHandler
                                     }
                                     
                                     break;
+                                
+                                case 4:
+                                    Console.WriteLine("---- ACCOUNT DETAILS ---- ");
+                                    Console.WriteLine($"Username: {currentUser.Username}");
+                                    Console.WriteLine($"Password: {currentUser.Password}");
+                                    Console.WriteLine($"Token: {currentUser.Token}");
+                                    Console.WriteLine("------------------------- ");
+                                    break;
                                 case 0:
                                     currentUser = null;
+                                    break;
+                                
+                                default:
+                                    Console.WriteLine("Invalid input.");
                                     break;
                             }
                         }
                     }
                     break;
                 case 2:
+                    Console.WriteLine("---- CREATE NEW ACCOUNT ----");
                     Console.Write("Enter your NEW Username: ");
                     string newUsername = Console.ReadLine();
                     Console.Write("Enter your NEW Password: ");
@@ -321,8 +373,23 @@ public class MenuHandler
                         _logger.LogWarning("Failed to create account.");
                     }
                     break;
+                default:
+                    Console.WriteLine("Invalid input.");
+                    break;
             }
         }
     }
+    
+    // HELPERS
+
+    private int ReadInt()
+    {
+        if (int.TryParse(Console.ReadLine(), out int result))
+        {
+            return result;
+        }
+        return -1;
+    }
+    
     
 }
