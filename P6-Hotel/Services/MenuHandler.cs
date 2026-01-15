@@ -72,14 +72,14 @@ public class MenuHandler
                     {
                         if (currentUser.Role is UserRole.Admin)
                         {
-                            Console.WriteLine("\n---- [ADMIN MENU] ----\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout\n----------------------");
+                            Console.WriteLine($"\n---- [ADMIN MENU] ---- User : {currentUser.Username}\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout\n----------------------");
                             Console.Write("Option: ");
                             int input = ReadInt();
                             switch (input)
                             {
                                 case 1:
-                                    Console.WriteLine(
-                                        "\n---- [ROOM-MANAGER MENU] ----\n1. View ALL Rooms\n2. Add Room\n3. Modify Room\n4. Remove Room\n------------------------------");
+                                    Console.WriteLine("\n---- [ROOM-MANAGER MENU] ----\n1. View ALL Rooms\n2. Add Room\n3. Modify Room\n4. Remove Room\n------------------------------");
+                                    Console.Write("Option: ");
                                     int input2 = ReadInt();
                                     switch (input2)
                                     {
@@ -155,12 +155,14 @@ public class MenuHandler
                                 case 3:
                                     Console.WriteLine("---- [GENERAL RULES] ----");
                                     Console.WriteLine("1. Set MIN booking days\n2. Set MAX booking days");
+                                    Console.WriteLine("------------------------");
                                     Console.Write("Option: ");
                                     int input3 = ReadInt();
 
                                     switch (input3)
                                     {
                                         case 1:
+                                            Console.WriteLine("---- SET MINIMUM DAYS ----");
                                             Console.WriteLine($"Minimum amount of days (current is {_hotelService.GetMinBookingDays()}) : ");
                                             int temp =  ReadInt();
                                             try
@@ -173,6 +175,7 @@ public class MenuHandler
                                             }
                                             break;
                                         case 2:
+                                            Console.WriteLine("---- SET MAXIMUM DAYS ----");
                                             Console.WriteLine($"Maximum amount of days (current is {_hotelService.GetMaxBookingDays()}) : ");
                                             int temp1 =  ReadInt();
                                             try
@@ -201,13 +204,15 @@ public class MenuHandler
                         }
                         else if (currentUser.Role is UserRole.Client)
                         {
-                            Console.WriteLine("\n---- CLIENT MENU ----");
-                            Console.WriteLine(
-                                "1. Search Rooms\n2. Reservation Hub\n3. Check-in/out\n4. Account Details\n0. Logout");
+                            Console.WriteLine($"\n---- CLIENT MENU ---- User : {currentUser.Username}");
+                            Console.WriteLine("1. Search Rooms\n2. Reservation Hub\n3. Check-in/out\n4. Account Details\n0. Logout");
+                            Console.WriteLine("----------------------");
+                            Console.Write("Option: ");
                             int input = ReadInt();
                             switch (input)
                             {
                                 case 1:
+                                    Console.WriteLine("---- SEARCH ROOM ----");
                                     Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
                                     RoomType roomType = (RoomType)ReadInt();
                                     
@@ -234,10 +239,11 @@ public class MenuHandler
                                     int nrNights = ReadInt();
                                     _hotelService.SearchAvailableRooms(roomType, startDate1, startDate1.AddDays(nrNights));
                                     break;
+                                
                                 case 2:
-                                    
-                                    Console.WriteLine("---- RESERVATION HUB ----");
+                                    Console.WriteLine("\n---- RESERVATION HUB ----");
                                     Console.WriteLine("1. Create Reservation\n2. View Reservations\n3. Delete Reservation");
+                                    Console.WriteLine("-------------------------");
                                     Console.Write("Option: ");
                                     
                                     int input2 = ReadInt();
@@ -245,6 +251,8 @@ public class MenuHandler
                                     switch (input2)
                                     {
                                         case 1:
+                                            Console.WriteLine("---- CREATE RESERVATION ----");
+                                            
                                             Console.WriteLine("Room ID: ");
                                             id = ReadInt();
                                             
@@ -285,7 +293,8 @@ public class MenuHandler
                                             break;
                                         
                                         case 3:
-                                            Console.WriteLine("Room ID: ");
+                                            Console.WriteLine("---- DELETE RESERVATION ----");
+                                            Console.WriteLine("Reservation ID: ");
                                             id = ReadInt();
                                             try
                                             {
@@ -302,13 +311,15 @@ public class MenuHandler
                                     break;
 
                                 case 3:
-                                    Console.WriteLine("---- CHECK-IN/OUT ---- ");
+                                    Console.WriteLine("\n---- CHECK-IN/OUT ---- ");
                                     Console.WriteLine("1. Check-in\n2. Check-out");
+                                    Console.WriteLine("----------------------");
                                     Console.Write("Option: ");
                                     input2 = ReadInt();
                                     switch (input2)
                                     {
                                         case 1:
+                                            Console.WriteLine("---- CHECK-IN ----");
                                             Console.WriteLine("Reservation ID: ");
                                             id = ReadInt();
                                             try
@@ -323,6 +334,7 @@ public class MenuHandler
                                             break;
                                         
                                         case 2:
+                                            Console.WriteLine("---- CHECK-OUT ----");
                                             Console.WriteLine("Reservation ID: ");
                                             id = ReadInt();
                                             try

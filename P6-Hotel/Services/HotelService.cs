@@ -189,7 +189,7 @@ public class HotelService
                     flag = true;
                     Console.WriteLine("\n-------------\nAvailable Rooms: ");                    
                 }
-                Console.WriteLine($"{room.Id} - {room.Type}");
+                Console.WriteLine($"#{room.Id} - {room.Type} - {room.Price}$/Night");
             }
         }
         if (flag == false)
@@ -267,13 +267,14 @@ public class HotelService
         List<Reservation> reservations = _reservations.Where(x => x.ClientUsername == username).ToList();
         if (reservations.Count == 0)
         {
-            Console.WriteLine("You have no reservations to view!");
+            Console.WriteLine("\nYou have no reservations to view!");
             return;
         }
 
         foreach (Reservation res in reservations)
         {
-            Console.WriteLine($"Reservation ID : {res.Id} | Room ID : {res.RoomId} | Start-date : {res.StartDate} | End-date {res.EndDate} | Checked-IN : {res.IsCheckedIn} | Is-Completed : {res.IsCompleted}");
+            double price = (res.EndDate-res.StartDate).Days * _rooms.FirstOrDefault(r => r.Id == res.RoomId).Price;
+            Console.WriteLine($"Reservation ID : {res.Id} | Room ID : {res.RoomId} | Start-date : {res.StartDate} | End-date {res.EndDate} | Total Price : {price}$ | Checked-IN : {res.IsCheckedIn} | Is-Completed : {res.IsCompleted}");
         }
         
     }
