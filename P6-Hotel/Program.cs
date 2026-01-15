@@ -12,7 +12,7 @@ class Program
             ConfigureServices((context, services) =>
             {
                 services.AddSingleton<HotelService>();
-                services.AddSingleton<MenuHandler>();
+                services.AddSingleton<MenuService>();
             })
             .ConfigureLogging(logging =>
             {
@@ -21,7 +21,7 @@ class Program
             })
             .Build();
         
-        var app = host.Services.GetRequiredService<MenuHandler>();
+        var app = host.Services.GetRequiredService<MenuService>();
         app.ShowMenu();
     }
 }

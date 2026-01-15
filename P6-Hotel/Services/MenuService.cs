@@ -2,12 +2,12 @@
 
 namespace P6_Hotel;
 
-public class MenuHandler
+public class MenuService
 {
     private readonly HotelService _hotelService;
-    private readonly ILogger<MenuHandler> _logger;
+    private readonly ILogger<MenuService> _logger;
 
-    public MenuHandler(HotelService hotelService, ILogger<MenuHandler> logger)
+    public MenuService(HotelService hotelService, ILogger<MenuService> logger)
     {
         _hotelService = hotelService;
         _logger = logger;
