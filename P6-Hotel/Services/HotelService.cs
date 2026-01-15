@@ -171,7 +171,7 @@ public class HotelService
                                     switch (input3)
                                     {
                                         case 1:
-                                            Console.WriteLine($"Minimttum amount of days (current is {_config.MinBookingDays}) : ");
+                                            Console.WriteLine($"Minimum amount of days (current is {_config.MinBookingDays}) : ");
                                             int temp =  int.Parse(Console.ReadLine());
                                             if (temp > 0 && temp < _config.MaxBookingDays)
                                             {
