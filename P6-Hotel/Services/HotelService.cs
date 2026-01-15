@@ -95,7 +95,7 @@ public class HotelService
                 int counter = 1;
                 foreach (var res in reservations)
                 {
-                    Console.WriteLine($"#{counter++} Start-date : {res.StartDate} => End-date : {res.EndDate}");
+                    Console.WriteLine($"#{counter++} Start-date : {res.StartDate} => End-date : {res.EndDate} | Total-revenue : {(res.EndDate-res.StartDate).Days*r.Price}$");
                 }
             }
         }
@@ -160,7 +160,7 @@ public class HotelService
             Console.WriteLine("Viewing all reservations :");
             foreach (var r in _reservations)
             {
-                Console.WriteLine($"Username : {r.ClientUsername} | Id : {r.Id}");
+                Console.WriteLine($"Username : {r.ClientUsername} | Id : {r.Id} | RoomId : {r.RoomId} | Checked-In : {r.IsCheckedIn} | Checked-out : {r.IsCompleted}");
             }
         }
         else
