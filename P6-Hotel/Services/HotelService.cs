@@ -41,342 +41,14 @@ public class HotelService
             FileHandler.SaveFile("Users.json", _users);
         }
     }
+    
 
-    public void Run()
-    {
-        _logger.LogInformation("Application interaction started.");
-        User currentUser = null;
-        int id,logInOpt;
-        
-        while (true)
-        {
-            if (currentUser == null)
-            {
-                Console.WriteLine("\n--------- PICK AN OPTION ---------");
-                Console.WriteLine("1. Log-in (to an existing account)\n2.Create Acconut");
-                Console.Write("Option: ");
-                logInOpt = int.Parse(Console.ReadLine());
-            }
-            else
-            {
-                logInOpt = 1;
-            }
-            switch (logInOpt)
-            {
-                case 1:
-                    if (currentUser == null)
-                    {
-                        Console.WriteLine("\n--------- WELCOME ---------");
-                        Console.Write("Username: ");
-                        string username = Console.ReadLine();
-                        Console.Write("Password: ");
-                        string password = Console.ReadLine();
-
-                        currentUser = Login(username, password);
-                        if (currentUser == null)
-                        {
-                            Console.WriteLine("Invalid username or password!");
-                            _logger.LogWarning($"Failed login attempt for user: {username}.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("You successfully logged in!");
-                            _logger.LogWarning($"User {username} logged in.");
-                        }
-                    }
-                    else
-                    {
-                        if (currentUser.Role is UserRole.Admin)
-                        {
-                            Console.WriteLine("\n[ADMIN MENU]\n1. Room-Manager\n2. View Reservations\n3. General Rules\n0. Logout");
-                            int input = int.Parse(Console.ReadLine());
-                            switch (input)
-                            {
-                                case 1:
-                                    Console.WriteLine(
-                                        "\n[ROOM-MANAGER MENU]\n1.View ALL Rooms\n2. Add Room\n3. Modify Room\n4. Remove Room");
-                                    int input2 = int.Parse(Console.ReadLine());
-                                    switch (input2)
-                                    {
-                                        case 1:
-                                            Console.WriteLine("---- ALL ROOMS ----");
-                                            ViewAllRooms();
-                                            break;
-
-                                        case 2:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                            RoomType roomType = (RoomType)int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Price: ");
-                                            double price = double.Parse(Console.ReadLine());
-                                            
-                                            try
-                                            {
-                                                AddRoom(id, roomType, price, RoomStatus.Available);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to add room.");
-                                            }
-                                            break;
-
-                                        case 3:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                            RoomType roomType1 = (RoomType)int.Parse(Console.ReadLine());
-                                            Console.WriteLine("Room Price: ");
-                                            double price1 = double.Parse(Console.ReadLine());
-                                            Console.WriteLine(
-                                                "Room Status (0 = Available, 1 = Unavailable)");
-                                            RoomStatus roomStatus1 = (RoomStatus)int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                ModifyRoom(id, roomType1, price1, roomStatus1);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to modify room.");
-                                            }
-                                            break;
-
-                                        case 4:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                RemoveRoom(id);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to remove room.");                                             
-                                            }
-                                            break;
-                                    }
-
-                                    break;
-                                case 2:
-                                    ViewAllReservations();
-                                    break;
-                                case 3:
-                                    Console.WriteLine("[GENERAL RULES]");
-                                    Console.WriteLine("1. Set MIN booking days\n2. Set MAX booking days");
-                                    Console.Write("Option");
-                                    int input3 = int.Parse(Console.ReadLine());
-
-                                    switch (input3)
-                                    {
-                                        case 1:
-                                            Console.WriteLine($"Minimum amount of days (current is {_config.MinBookingDays}) : ");
-                                            int temp =  int.Parse(Console.ReadLine());
-                                            if (temp > 0 && temp < _config.MaxBookingDays)
-                                            {
-                                                _config.MinBookingDays = temp;
-                                                _logger.LogWarning($"MIN booking changed to {_config.MinBookingDays}.");
-                                                FileHandler.SaveFile("Config.json", new List<HotelConfig>{_config});
-                                            }
-                                            else
-                                            {
-                                                _logger.LogWarning("Invalid MIN amount.");
-                                            }
-                                            break;
-                                        case 2:
-                                            Console.WriteLine($"Maximum amount of days (current is {_config.MaxBookingDays}) : ");
-                                            int temp1 =  int.Parse(Console.ReadLine());
-                                            if (temp1 > 0 && temp1 > _config.MinBookingDays)
-                                            { 
-                                                _config.MaxBookingDays = temp1;
-                                                _logger.LogWarning($"MAX booking changed to {_config.MaxBookingDays}.");
-                                                FileHandler.SaveFile("Config.json", new List<HotelConfig>{_config});
-                                            }
-                                            else
-                                            {
-                                                _logger.LogWarning("Invalid MAX amount.");
-                                            }
-                                            break;
-                                    }
-                                    break;
-                                
-                                case 0:
-                                    currentUser = null;
-                                    break;
-                            }
-                        }
-                        else if (currentUser.Role is UserRole.Client)
-                        {
-                            Console.WriteLine("\n---- CLIENT MENU ----");
-                            Console.WriteLine(
-                                "1. Search Rooms\n2. Reservation Hub\n3. Check-in/out\n0. Logout");
-                            int input = int.Parse(Console.ReadLine());
-                            switch (input)
-                            {
-                                case 1:
-                                    Console.WriteLine("Room Type (0 = Single, 1 = Double, 2 = Suite): ");
-                                    RoomType roomType = (RoomType)int.Parse(Console.ReadLine());
-                                    
-                                    Console.WriteLine("Start Date :");
-                                    Console.Write("Day: ");
-                                    int day1 = int.Parse(Console.ReadLine());
-                                    Console.Write("Month: ");
-                                    int month1 = int.Parse(Console.ReadLine());
-                                    Console.Write("Year: ");
-                                    int  year1 = int.Parse(Console.ReadLine());
-
-                                    DateTime startDate1;
-                                    try
-                                    {
-                                        startDate1 = InputToDate(day1, month1, year1);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Console.WriteLine(e.Message);
-                                        break;
-                                    }               
-                                    
-                                    Console.Write("Number of Nights: ");
-                                    int nrNights = int.Parse(Console.ReadLine());
-                                    SearchAvailableRooms(roomType, startDate1, startDate1.AddDays(nrNights));
-                                    break;
-                                case 2:
-                                    
-                                    Console.WriteLine("---- RESERVATION HUB ----");
-                                    Console.WriteLine("1. Create Reservation\n2. View Reservations\n3. Delete Reservation");
-                                    Console.Write("Option: ");
-                                    
-                                    int input2 = int.Parse(Console.ReadLine());
-
-                                    switch (input2)
-                                    {
-                                        case 1:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            
-                                            Console.WriteLine("Start Date :");
-                                            Console.Write("Day: ");
-                                            int day = int.Parse(Console.ReadLine());
-                                            Console.Write("Month: ");
-                                            int month = int.Parse(Console.ReadLine());
-                                            Console.Write("Year: ");
-                                            int  year = int.Parse(Console.ReadLine());
-
-                                            DateTime startDate;
-                                            try
-                                            {
-                                                 startDate = InputToDate(day, month, year);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                break;
-                                            }
-                                            
-                                            Console.WriteLine("Number of Nights: ");
-                                            int nights = int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                MakeReservation(currentUser.Username, id,startDate, nights);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to create reservation.");
-                                            }
-                                            break;
-                                        
-                                        case 2:
-                                            ViewReservation(currentUser.Username);
-                                            break;
-                                        
-                                        case 3:
-                                            Console.WriteLine("Room ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                RemoveReservation(currentUser.Username, id);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to delete reservation.");
-                                            }
-                                            break;
-                                    }
-
-                                    break;
-
-                                case 3:
-                                    Console.WriteLine("---- CHECK-IN/OUT ---- ");
-                                    Console.WriteLine("1. Check-in\n2. Check-out");
-                                    Console.Write("Option: ");
-                                    input2 = int.Parse(Console.ReadLine());
-                                    switch (input2)
-                                    {
-                                        case 1:
-                                            Console.WriteLine("Reservation ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                SelfCheckIn(id,currentUser.Username);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to check in.");
-                                            }
-                                            break;
-                                        
-                                        case 2:
-                                            Console.WriteLine("Reservation ID: ");
-                                            id = int.Parse(Console.ReadLine());
-                                            try
-                                            {
-                                                SelfCheckOut(id,currentUser.Username);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e.Message);
-                                                _logger.LogWarning("Failed to check in.");
-                                            }
-                                            break;
-                                    }
-                                    
-                                    break;
-                                case 0:
-                                    currentUser = null;
-                                    break;
-                            }
-                        }
-                    }
-                    break;
-                case 2:
-                    Console.Write("Enter your NEW Username: ");
-                    string newUsername = Console.ReadLine();
-                    Console.Write("Enter your NEW Password: ");
-                    string newPassword = Console.ReadLine();
-                    try
-                    {
-                        CreateAccount(newUsername, newPassword);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        _logger.LogWarning("Failed to create account.");
-                    }
-                    break;
-            }
-        }
-    }
-
-    private User Login(string username, string password)
+    public User Login(string username, string password)
     {
         return _users.FirstOrDefault(x => x.Username == username && x.Password == password);
     }
 
-    private void CreateAccount(string username, string password)
+    public void CreateAccount(string username, string password)
     {
         if (_users.Any(x => x.Username == username))
         {
@@ -390,7 +62,7 @@ public class HotelService
     
     // ADMIN CMDS
     
-    private void ViewAllRooms()
+    public void ViewAllRooms()
     {
         foreach (var r in _rooms)
         {
@@ -409,7 +81,7 @@ public class HotelService
     }
     
     
-    private void AddRoom(int id, RoomType roomType, double price, RoomStatus roomStatus)
+    public void AddRoom(int id, RoomType roomType, double price, RoomStatus roomStatus)
     {
         if (_rooms.Any(x => x.Id == id))
         {
@@ -422,7 +94,7 @@ public class HotelService
         _logger.LogInformation($"Room {id} created!");
     }
 
-    private void RemoveRoom(int id)
+    public void RemoveRoom(int id)
     {
         var room = _rooms.FirstOrDefault(x => x.Id == id);
         if (room == null)
@@ -439,7 +111,7 @@ public class HotelService
 
     }
 
-    private void ModifyRoom(int id, RoomType roomType, double price, RoomStatus roomStatus)
+    public void ModifyRoom(int id, RoomType roomType, double price, RoomStatus roomStatus)
     {
         var room = _rooms.FirstOrDefault(x => x.Id == id);
         if (room == null)
@@ -454,7 +126,7 @@ public class HotelService
 
     }
     
-    private void ViewAllReservations()
+    public void ViewAllReservations()
     {
         Console.WriteLine("Viewing all reservations :");
         foreach (var r in _reservations)
@@ -465,7 +137,7 @@ public class HotelService
     
     // CLIENT CMDS
 
-    private void SearchAvailableRooms(RoomType roomType, DateTime startDate,  DateTime endDate)
+    public void SearchAvailableRooms(RoomType roomType, DateTime startDate,  DateTime endDate)
     {
         List<Room> availableRooms = _rooms.Where(x => x.Type == roomType && x.Status == RoomStatus.Available).ToList();
         foreach (Room room in availableRooms)
@@ -480,7 +152,7 @@ public class HotelService
         }
     }
     
-    private void MakeReservation(string username, int roomId, DateTime startDate, int nights)
+    public void MakeReservation(string username, int roomId, DateTime startDate, int nights)
     {
         var room = _rooms.FirstOrDefault(x => x.Id == roomId && x.Status == RoomStatus.Available);
         if (room == null)
@@ -523,7 +195,7 @@ public class HotelService
 
     }
 
-    private void RemoveReservation(string username, int reservationId)
+    public void RemoveReservation(string username, int reservationId)
     {
         var reservation = _reservations.FirstOrDefault(x => x.Id == reservationId && x.ClientUsername == username);
         if (reservation == null)
@@ -543,7 +215,7 @@ public class HotelService
     }
     
 
-    private void ViewReservation(string username)
+    public void ViewReservation(string username)
     {
         List<Reservation> reservations = _reservations.Where(x => x.ClientUsername == username).ToList();
         if (reservations.Count == 0)
@@ -559,7 +231,7 @@ public class HotelService
         
     }
 
-    private void SelfCheckIn(int reservationId, string username)
+    public void SelfCheckIn(int reservationId, string username)
     {
         var res = _reservations.FirstOrDefault(x => x.Id == reservationId && x.ClientUsername == username);
         if (res == null)
@@ -580,7 +252,7 @@ public class HotelService
 
     }
     
-    private void SelfCheckOut(int reservationId, string username)
+    public void SelfCheckOut(int reservationId, string username)
     {
         var res = _reservations.FirstOrDefault(x => x.Id == reservationId && x.ClientUsername == username);
         if (res == null)
@@ -603,6 +275,8 @@ public class HotelService
     }
     
     // HELPER METHODS
+
+    #region Helpers
     
     private int ReservationIdGenerator()
     {
@@ -614,7 +288,7 @@ public class HotelService
         return rId;
     }
 
-    private DateTime InputToDate(int day, int  month, int year)
+    public DateTime InputToDate(int day, int  month, int year)
     {
         DateTime new_date;
         try
@@ -632,4 +306,35 @@ public class HotelService
         }
         return new_date;
     }
+
+    public int GetMinBookingDays()
+    {
+        return _config.MinBookingDays;
+    }
+
+    public int GetMaxBookingDays()
+    {
+        return _config.MaxBookingDays;
+    }
+
+    public void SetMinBookingDays(int days)
+    {
+        if (days < 1) throw new Exception("Error: Min days must be greater 1.");
+        if (days >= _config.MaxBookingDays) throw new Exception("Error: Max days must be less than " + _config.MinBookingDays);
+        
+        _config.MinBookingDays = days;
+        FileHandler.SaveFile("Config.json", new List<HotelConfig> { _config });
+        _logger.LogInformation($"Set min days to {days}.");
+    }
+    
+    public void SetMaxBookingDays(int days)
+    {
+        if (days <= _config.MinBookingDays) throw new Exception("Error: Max days must be greater than Min days.");
+        
+        _config.MaxBookingDays = days;
+        FileHandler.SaveFile("Config.json", new List<HotelConfig> { _config });
+        _logger.LogInformation($"Set max days to {days}.");
+    }
 }
+
+#endregion
