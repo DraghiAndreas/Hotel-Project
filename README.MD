@@ -1,3 +1,5 @@
+![](./P6-Hotel/Extra/hotel-header.png)
+
 # Proiect 6 - Sistem pentru gestionarea unui Hotel cu Self Check-in
 
 Aplicatie de consola pentru administrarea unui hotel, scrisa in C# (.NET). Proiectul foloseste o arhitectura stratificata si salveaza datele in fisiere JSON.
